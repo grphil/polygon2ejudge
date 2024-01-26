@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"net/url"
+	"polygon2ejudge/lib/config"
 	"strconv"
 )
 
 const PACKAGES_METHOD = "problem.packages"
 const PACKAGE_METHOD = "problem.package"
 
-func (p *PolygonApi) ImportPackage(probIDInt int, outPath string) error {
+func ImportPackage(probIDInt int, outPath string) error {
 	probID := strconv.Itoa(probIDInt)
-	packageID, err := p.getPackages(probID)
+	packageID, err := getPackages(probID)
 	if err != nil {
 		return fmt.Errorf("%s: %s", PACKAGES_METHOD, err.Error())
 	}
 
-	err = p.downloadPackage(probID, strconv.Itoa(packageID), outPath)
+	err = downloadPackage(probID, strconv.Itoa(packageID), outPath)
 	if err != nil {
 		return fmt.Errorf("%s: %s", PACKAGE_METHOD, err.Error())
 	}
@@ -26,18 +27,18 @@ func (p *PolygonApi) ImportPackage(probIDInt int, outPath string) error {
 	return nil
 }
 
-func (p *PolygonApi) downloadPackage(probID string, packageID string, outPath string) error {
+func downloadPackage(probID string, packageID string, outPath string) error {
 	values := url.Values{}
 	values.Set("problemId", probID)
 	values.Set("packageId", packageID)
 	values.Set("type", "linux")
-	values = p.fixValues(PACKAGE_METHOD, values)
+	values = fixValues(PACKAGE_METHOD, values)
 
 	client := resty.New()
 	r := client.R()
 	r.SetQueryParamsFromValues(values)
 	r.SetOutput(outPath)
-	resp, err := r.Get(POLYGON_URL + PACKAGE_METHOD)
+	resp, err := r.Get(config.GlobalConfig.PolygonUrl + PACKAGE_METHOD)
 	if err != nil {
 		return err
 	}
@@ -59,15 +60,15 @@ type PSinglePackage struct {
 	Type     string `json:"type"`
 }
 
-func (p *PolygonApi) getPackages(probID string) (int, error) {
+func getPackages(probID string) (int, error) {
 	values := url.Values{}
 	values.Set("problemId", probID)
-	values = p.fixValues(PACKAGES_METHOD, values)
+	values = fixValues(PACKAGES_METHOD, values)
 
 	client := resty.New()
 	r := client.R()
 	r.SetQueryParamsFromValues(values)
-	res, err := r.Get(POLYGON_URL + PACKAGES_METHOD)
+	res, err := r.Get(config.GlobalConfig.PolygonUrl + PACKAGES_METHOD)
 	if err != nil {
 		return 0, err
 	}

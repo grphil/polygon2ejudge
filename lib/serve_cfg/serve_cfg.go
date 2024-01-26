@@ -126,7 +126,7 @@ func (s *ServeCFG) Problem(id int) *orderedmap.OrderedMap {
 }
 
 func (s *ServeCFG) Path() string {
-	return filepath.Join(config.JUDGES_DIR, fmt.Sprintf("%06d", s.ContestID))
+	return filepath.Join(config.GlobalConfig.JudgesDir, fmt.Sprintf("%06d", s.ContestID))
 }
 
 func (s *ServeCFG) ProblemPath(id int) (string, error) {

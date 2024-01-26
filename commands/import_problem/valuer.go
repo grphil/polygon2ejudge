@@ -27,6 +27,8 @@ func (t *ImportTask) buildValuer() error {
 		return err
 	}
 
+	fmt.Println("Processed tests and groups")
+
 	return nil
 }
 
@@ -140,7 +142,7 @@ func (t *ImportTask) processGroups(
 		valuerOptions.Set("olympiad_mode", true)
 		valuerOptions.Set("run_penalty", 0)
 
-		valuerR, err := os.Open(config.GVALUER_LOCATION)
+		valuerR, err := os.Open(config.GlobalConfig.GvaluerPath)
 		if err != nil {
 			return err
 		}

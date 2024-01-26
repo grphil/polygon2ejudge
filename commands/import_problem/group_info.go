@@ -2,7 +2,6 @@ package import_problem
 
 import (
 	"fmt"
-	"polygon2ejudge/lib/config"
 	"slices"
 )
 
@@ -83,7 +82,7 @@ func (t *ImportTask) AddGroupInfo(test *XTest, group *XGroup, acm bool) error {
 	}
 
 	if acm {
-		if g.samples {
+		if g.samples && *t.FullReportSamplesAcm {
 			g.feedbackType = FeedbackTypeFull
 		} else {
 			g.feedbackType = FeedbackTypeBrief
@@ -119,31 +118,27 @@ func (t *ImportTask) AddGroupInfo(test *XTest, group *XGroup, acm bool) error {
 		return fmt.Errorf("unsupported group points polycy %s", group.PointsPolicy)
 	}
 
-	if g.samples {
-		g.feedbackType = FeedbackTypeFull
-	} else {
-		switch group.FeedbackPolicy {
-		case "none":
-			if *t.NoOffline {
-				g.feedbackType = FeedbackTypeExists
-			} else {
-				g.feedbackType = FeedbackTypeHidden
-
-				t.markLastGroup()
-			}
-		case "points":
+	switch group.FeedbackPolicy {
+	case "none":
+		if *t.NoOffline {
 			g.feedbackType = FeedbackTypeExists
-		case "icpc":
-			g.feedbackType = FeedbackTypeBrief
-		case "complete":
-			if config.FULL_REPORT_ONLY_SAMPLES {
-				g.feedbackType = FeedbackTypeBrief
-			} else {
-				g.feedbackType = FeedbackTypeFull
-			}
-		default:
-			return fmt.Errorf("unsupported feedback policy %s", group.FeedbackPolicy)
+		} else {
+			g.feedbackType = FeedbackTypeHidden
+
+			t.markLastGroup()
 		}
+	case "points":
+		g.feedbackType = FeedbackTypeExists
+	case "icpc":
+		g.feedbackType = FeedbackTypeBrief
+	case "complete":
+		if g.samples || *t.AllowFullReport {
+			g.feedbackType = FeedbackTypeFull
+		} else {
+			g.feedbackType = FeedbackTypeBrief
+		}
+	default:
+		return fmt.Errorf("unsupported feedback policy %s", group.FeedbackPolicy)
 	}
 
 	t.groups = append(t.groups, g)

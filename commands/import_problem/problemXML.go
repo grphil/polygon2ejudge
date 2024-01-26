@@ -28,6 +28,7 @@ type XProblemStatements struct {
 type XProblemStatement struct {
 	Language string `xml:"language,attr"`
 	Type     string `xml:"type,attr"`
+	Path     string `xml:"path,attr"`
 }
 
 type XJudging struct {

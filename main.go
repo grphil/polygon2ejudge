@@ -5,6 +5,7 @@ import (
 	"github.com/hellflame/argparse"
 	"polygon2ejudge/commands/import_problem"
 	"polygon2ejudge/commands/remove_problem"
+	"polygon2ejudge/commands/reset"
 )
 
 func main() {
@@ -12,6 +13,8 @@ func main() {
 
 	import_problem.AddImportProblemCommand(parser)
 	remove_problem.AddRemoveProblemCommand(parser)
+
+	reset.AddResetConfigCommand(parser)
 
 	if e := parser.Parse(nil); e != nil {
 		fmt.Println(e.Error())

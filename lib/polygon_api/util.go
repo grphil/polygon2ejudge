@@ -5,14 +5,15 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"net/url"
+	"polygon2ejudge/lib/config"
 	"strconv"
 	"time"
 )
 
-func (p *PolygonApi) fixValues(method string, values url.Values) url.Values {
+func fixValues(method string, values url.Values) url.Values {
 	tm := time.Now().Unix()
 	values.Set("time", strconv.FormatInt(tm, 10))
-	values.Set("apiKey", p.confFile.ApiKey)
+	values.Set("apiKey", config.UserConfig.ApiKey)
 
 	builder := bytes.Buffer{}
 	rand := "000000"
@@ -22,7 +23,7 @@ func (p *PolygonApi) fixValues(method string, values url.Values) url.Values {
 	builder.WriteRune('?')
 	builder.WriteString(values.Encode())
 	builder.WriteRune('#')
-	builder.WriteString(p.confFile.ApiSecret)
+	builder.WriteString(config.UserConfig.ApiSecret)
 
 	endoded := sha512.Sum512(builder.Bytes())
 

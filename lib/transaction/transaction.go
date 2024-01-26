@@ -1,13 +1,12 @@
 package transaction
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"polygon2ejudge/lib/console"
 	"polygon2ejudge/lib/serve_cfg"
 	"strconv"
-	"strings"
 )
 
 type movePathAction struct {
@@ -135,10 +134,8 @@ func (t *Transaction) Finish() {
 			for _, message := range t.commitMessages {
 				fmt.Println(message)
 			}
-			fmt.Println("Apply them (y/n")
-			reader := bufio.NewReader(os.Stdin)
-			text, _ := reader.ReadString('\n')
-			if strings.ToLower(strings.TrimSpace(text)) == "y" {
+
+			if console.YesOrNo("Apply them?") {
 				t.apply()
 			}
 		}

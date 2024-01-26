@@ -42,20 +42,27 @@ func (t *ImportTask) ImportProblem() {
 	err = t.fillInConfig()
 	if err != nil {
 		t.Transaction.SetError(fmt.Errorf("error while building problem cfg, error: %s", err.Error()))
+		return
 	}
 
 	err = t.buildValuer()
 	if err != nil {
 		t.Transaction.SetError(err)
+		return
 	}
 
-	err = t.Transaction.MovePath(
+	if !*t.NoStatements {
+		err = t.generateStatements()
+		if err != nil {
+			t.Transaction.SetError(err)
+			return
+		}
+	}
+
+	t.Transaction.MovePath(
 		t.probDir,
 		filepath.Join(t.serveCFG.Path(), "problems", t.internalName),
 	)
-	if err != nil {
-		return
-	}
 }
 
 func (t *ImportTask) addDeferFunc(f func()) {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"polygon2ejudge/lib/config"
 	"polygon2ejudge/lib/orderedmap"
 	"polygon2ejudge/lib/serve_cfg"
 	"strconv"
@@ -25,7 +24,7 @@ func (t *ImportTask) fillInConfig() error {
 	t.config.Set("id", *t.EjudgeId)
 
 	abstract := t.Abstract
-	if len(*abstract) == 0 && config.GENERIC_PARENT && t.serveCFG.HasGeneric {
+	if len(*abstract) == 0 && !*t.NoGenericParent && t.serveCFG.HasGeneric {
 		abstract = &serve_cfg.GENERIC
 	}
 	if len(*abstract) > 0 {
@@ -62,7 +61,7 @@ func (t *ImportTask) fillInConfig() error {
 		t.config.Set("interactor_cmd", getFileName(t.problemXML.Assets.Interactor.Source))
 	}
 
-	if config.COMPILE_MAIN_SOLUTION {
+	if !*t.NoCompileMainSolution {
 		for _, s := range t.problemXML.Assets.Solutions.Solutions {
 			if s.Tag == "main" {
 				t.config.Set("solution_cmd", getFileName(s.Source))
@@ -72,11 +71,11 @@ func (t *ImportTask) fillInConfig() error {
 
 	t.config.Set("enable_testlib_mode", true)
 
-	if config.TEXTAREA_INPUT {
+	if !*t.NoTextareaInput {
 		t.config.Set("enable_text_form", true)
 	}
 
-	if config.ENABLE_CUSTOM_RUN {
+	if !*t.NoCustomRun {
 		t.config.Set("enable_user_input", true)
 	}
 
@@ -88,9 +87,9 @@ func (t *ImportTask) fillInConfig() error {
 func (t *ImportTask) setCustomOptions() {
 	file, err := os.Open(filepath.Join(t.probDir, "documents/description.txt"))
 	if err != nil {
-		fmt.Println("No description.txt file provided")
 		return
 	}
+	fmt.Println("description.txt file provided, will try read configs from it")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -173,7 +172,7 @@ func (t *ImportTask) setLimits() error {
 	return fmt.Errorf("testset \"tests\" not found")
 }
 
-func (t *ImportTask) setNames() {
+func (t *ImportTask) setNames() error {
 	shortNames := make(map[string]bool)
 	internalNames := make(map[string]bool)
 	for _, prob := range t.serveCFG.Problems {
@@ -223,6 +222,15 @@ func (t *ImportTask) setNames() {
 	}
 	t.config.Set("internal_name", internalName)
 	t.internalName = internalName
+	if !*t.NoPackageSave {
+		err := t.Transaction.MovePath(
+			t.packagePath,
+			filepath.Join(t.serveCFG.Path(), "download", fmt.Sprintf("%s.zip", t.internalName)),
+		)
+		if err != nil {
+			return err
+		}
+	}
 
 	var russianName string
 	var englishName string
@@ -248,6 +256,7 @@ func (t *ImportTask) setNames() {
 	}
 	t.config.Set("long_name", russianName)
 	t.problemOnlyConfig.Set("long_name_en", englishName)
+	return nil
 }
 
 func (t *ImportTask) exportConfig() {

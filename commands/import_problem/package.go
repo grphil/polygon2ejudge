@@ -14,21 +14,10 @@ func (t *ImportTask) importPackage() error {
 		return err
 	}
 
-	if t.PolygonApi == nil {
-		t.PolygonApi, err = polygon_api.NewPolygonApi(*t.ResetCredentials)
-		if err != nil {
-			return fmt.Errorf("can not create polygon api, err: %s", err.Error())
-		}
-	}
-
-	err = t.PolygonApi.ImportPackage(*t.PolygonProbId, t.packagePath)
+	fmt.Printf("downloading package for problem %d\n", *t.PolygonProbId)
+	err = polygon_api.ImportPackage(*t.PolygonProbId, t.packagePath)
 	if err != nil {
 		return fmt.Errorf("polygon api error while loading package: %s", err.Error())
-	}
-
-	err = t.Transaction.MovePath(t.packagePath, filepath.Join(t.serveCFG.Path(), "download", "pack.zip"))
-	if err != nil {
-		return err
 	}
 
 	return nil

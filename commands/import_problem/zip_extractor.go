@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"polygon2ejudge/lib/config"
 	"strings"
 )
 
@@ -34,7 +33,7 @@ func (t *ImportTask) extractProblemFiles() error {
 		return err
 	}
 
-	err = t.moveFile("problem.xml", "")
+	err = t.moveFileName("problem.xml", "")
 	if err != nil {
 		return err
 	}
@@ -73,47 +72,49 @@ func (t *ImportTask) extractProblemFiles() error {
 		return fmt.Errorf("can not extract documents, error: %s", err.Error())
 	}
 
-	if config.CREATE_STATEMENTS {
-		err = t.extractAllFiles("statement-sections", "statement-sections")
-		if err != nil {
-			return fmt.Errorf("can not extract statement sections, error: %s", err.Error())
-		}
-	}
-
-	fmt.Println("Extracted all files from zip archive")
+	fmt.Println("Extracted all problem files from zip archive")
 	return nil
 }
 
 func (t *ImportTask) extractSolutions() error {
 	solutionsPath := "solutions1"
-	if config.COMPILE_ALL_SOLUTIONS {
+	if *t.CompileAllSolutions {
 		solutionsPath = "solutions"
 	}
 
 	for _, solution := range t.problemXML.Assets.Solutions.Solutions {
-		err := t.moveFile(solution.Source.Path, solutionsPath)
+		err := t.moveFileName(solution.Source.Path, solutionsPath)
 		if err != nil {
 			return err
 		}
+
+		if solution.Tag == "main" {
+			name := filepath.Base(solution.Source.Path)
+			err = copyFile(
+				filepath.Join(t.probDir, solutionsPath, name),
+				filepath.Join(t.probDir, name),
+			)
+		}
+
 	}
 	return nil
 }
 
 func (t *ImportTask) extractAssets() error {
-	err := t.moveFile(t.problemXML.Assets.Checker.Source.Path, "")
+	err := t.moveFileName(t.problemXML.Assets.Checker.Source.Path, "")
 	if err != nil {
 		return fmt.Errorf("can not extract checker, error: %s", err.Error())
 	}
 
 	if t.problemXML.Assets.Interactor != nil {
-		err = t.moveFile(t.problemXML.Assets.Interactor.Source.Path, "")
+		err = t.moveFileName(t.problemXML.Assets.Interactor.Source.Path, "")
 		if err != nil {
 			return fmt.Errorf("can not extract interactor, error: %s", err.Error())
 		}
 	}
 
 	for _, resource := range t.problemXML.Files.Resources.Resources {
-		err = t.moveFile(resource.Path, "")
+		err = t.moveFileName(resource.Path, "")
 		if err != nil {
 			return err
 		}
@@ -149,7 +150,11 @@ func (t *ImportTask) extractAllFiles(prefix string, dst string) error {
 	return nil
 }
 
-func (t *ImportTask) moveFile(srcPath string, dstDir string) error {
+func (t *ImportTask) moveFileName(srcPath string, dstDir string) error {
+	return t.moveFile(srcPath, dstDir, filepath.Base(srcPath))
+}
+
+func (t *ImportTask) moveFile(srcPath string, dstDir string, name string) error {
 	dstDir = filepath.Join(t.probDir, dstDir)
 	err := os.MkdirAll(dstDir, 0774)
 	if err != nil {
@@ -158,7 +163,7 @@ func (t *ImportTask) moveFile(srcPath string, dstDir string) error {
 
 	for _, file := range t.archive.File {
 		if file.Name == srcPath {
-			err = moveSingleFile(file, filepath.Join(dstDir, filepath.Base(srcPath)))
+			err = moveSingleFile(file, filepath.Join(dstDir, name))
 			if err != nil {
 				return fmt.Errorf("can not extract zip file %s to dir %s, error: %s", srcPath, dstDir, err.Error())
 			}

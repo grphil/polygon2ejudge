@@ -5,7 +5,6 @@ import (
 	"github.com/hellflame/argparse"
 	"polygon2ejudge/commands/common"
 	"polygon2ejudge/lib/orderedmap"
-	"polygon2ejudge/lib/polygon_api"
 	"polygon2ejudge/lib/serve_cfg"
 	transaction2 "polygon2ejudge/lib/transaction"
 )
@@ -16,7 +15,6 @@ type ImportTask struct {
 	ShortName     *string
 	EjudgeId      *int
 
-	PolygonApi  *polygon_api.PolygonApi
 	Transaction *transaction2.Transaction
 
 	tmpDir      string
@@ -37,6 +35,9 @@ type ImportTask struct {
 	deferFuncs []func()
 
 	groups []*GroupInfo
+
+	statement     *EjudgeStatementBuilder
+	statementPath string
 }
 
 func AddImportProblemCommand(parser *argparse.Parser) {

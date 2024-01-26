@@ -1,7 +1,9 @@
 package remove_problem
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 )
 
@@ -21,6 +23,21 @@ func (t *RemoveTask) RemoveProblem() {
 	if len(internalName) == 0 {
 		t.Transaction.SetError(fmt.Errorf("can not remove problem with id %d, problem has no dir", *t.EjudgeProblemId))
 		return
+	}
+
+	packageZipPath := filepath.Join(serveCFG.Path(), "download", fmt.Sprintf("%s.zip", internalName))
+
+	_, err = os.Stat(packageZipPath)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			t.Transaction.SetError(err)
+			return
+		}
+	} else {
+		err = t.Transaction.RemovePath(packageZipPath)
+		if err != nil {
+			return
+		}
 	}
 
 	delete(serveCFG.Problems, *t.EjudgeProblemId)
