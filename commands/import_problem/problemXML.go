@@ -3,6 +3,7 @@ package import_problem
 type XProblemXML struct {
 	ShortName string `xml:"short-name,attr"`
 	Revision  string `xml:"revision,attr"`
+	Url       string `xml:"url,attr"`
 
 	Names      XProblemNames      `xml:"names"`
 	Statements XProblemStatements `xml:"statements"`

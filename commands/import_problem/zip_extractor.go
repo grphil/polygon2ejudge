@@ -50,7 +50,8 @@ func (t *ImportTask) extractProblemFiles() error {
 		return fmt.Errorf("can not parse problem xml, error: %s", err.Error())
 	}
 
-	fmt.Printf("Parsed problem.xml for problem %s id %d\n", t.problemXML.ShortName, *t.PolygonProbId)
+	fmt.Printf("Parsed problem.xml for problem %s\n", t.problemXML.ShortName)
+	t.PolygonProbUrl = &t.problemXML.Url
 
 	err = t.extractSolutions()
 	if err != nil {
@@ -88,6 +89,7 @@ func (t *ImportTask) extractSolutions() error {
 			return err
 		}
 
+		solution.Source.Path = t.fixFileName(solution.Source.Path)
 		if solution.Tag == "main" {
 			name := filepath.Base(solution.Source.Path)
 			err = copyFile(
@@ -141,7 +143,7 @@ func (t *ImportTask) extractAllFiles(prefix string, dst string) error {
 				return err
 			}
 
-			err = moveSingleFile(file, dstPath)
+			err = t.moveSingleFile(file, dstPath)
 			if err != nil {
 				return err
 			}
@@ -163,7 +165,7 @@ func (t *ImportTask) moveFile(srcPath string, dstDir string, name string) error 
 
 	for _, file := range t.archive.File {
 		if file.Name == srcPath {
-			err = moveSingleFile(file, filepath.Join(dstDir, name))
+			err = t.moveSingleFile(file, filepath.Join(dstDir, name))
 			if err != nil {
 				return fmt.Errorf("can not extract zip file %s to dir %s, error: %s", srcPath, dstDir, err.Error())
 			}
@@ -173,7 +175,8 @@ func (t *ImportTask) moveFile(srcPath string, dstDir string, name string) error 
 	return fmt.Errorf("file with path %s not found", srcPath)
 }
 
-func moveSingleFile(src *zip.File, dst string) error {
+func (t *ImportTask) moveSingleFile(src *zip.File, dst string) error {
+	dst = t.fixFileName(dst)
 	w, err := os.OpenFile(
 		dst,
 		os.O_CREATE|os.O_TRUNC|os.O_WRONLY,
@@ -196,4 +199,11 @@ func moveSingleFile(src *zip.File, dst string) error {
 	}
 
 	return nil
+}
+
+func (t *ImportTask) fixFileName(path string) string {
+	if !*t.NoConvertDprToPas && filepath.Ext(path) == ".dpr" {
+		return path[:len(path)-4] + ".pas"
+	}
+	return path
 }

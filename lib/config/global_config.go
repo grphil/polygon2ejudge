@@ -10,6 +10,11 @@ import (
 
 const GlobalConfigVersion = "global.1"
 
+const LangPy = "py"
+const LangCpp = "cpp"
+const LangJava = "java"
+const LangPas = "pas"
+
 type TGlobalConfig struct {
 	Version string `yaml:"version"`
 
@@ -57,10 +62,12 @@ func TryLoadGlobalConfig() bool {
 	err = yaml.Unmarshal(data, globalConfig)
 	if err != nil {
 		ResetGlobalConfig()
+		return true
 	}
 
 	if globalConfig.Version != GlobalConfigVersion {
 		ResetGlobalConfig()
+		return true
 	}
 
 	GlobalConfig = globalConfig

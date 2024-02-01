@@ -7,6 +7,11 @@ import (
 type TaskCommon struct {
 	ContestId *int
 
+	// Submit options
+	OnlyMain *bool
+	NoLint   *bool
+
+	// Import options
 	NoOffline *bool
 
 	Abstract        *string
@@ -25,14 +30,26 @@ type TaskCommon struct {
 
 	AllowFullReport      *bool
 	FullReportSamplesAcm *bool
+
+	NoConvertDprToPas *bool
 }
 
-func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool) {
+func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, hasSubmit bool) {
 	t.ContestId = parser.Int("", "contest_id", &argparse.Option{
-		Help:       "Id of ejudge contest to add problem",
+		Help:       "ID of ejudge contest",
 		Required:   true,
 		Positional: true,
 	})
+
+	if hasSubmit {
+		t.OnlyMain = parser.Flag("m", "only-main", &argparse.Option{
+			Help: "Submit only main solution (if specified)",
+		})
+		t.NoLint = parser.Flag("l", "no-lint", &argparse.Option{
+			Help: "Add nolint string to solutions",
+		})
+	}
+
 	if hasImport {
 		t.Abstract = parser.String("", "abstract", &argparse.Option{
 			Help: "Abstract \"parent\" problem to import all configs from",
@@ -77,6 +94,10 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool) {
 		})
 		t.FullReportSamplesAcm = parser.Flag("s", "full-report-samples-acm", &argparse.Option{
 			Help: "Add full report for samples in acm problems",
+		})
+
+		t.NoConvertDprToPas = parser.Flag("", "no-dpr-to-pas", &argparse.Option{
+			Help: "Do not change extension of all .dpr files to .pas",
 		})
 	}
 

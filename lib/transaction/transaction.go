@@ -2,9 +2,11 @@ package transaction
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"path/filepath"
 	"polygon2ejudge/lib/console"
+	"polygon2ejudge/lib/ejudge_session"
 	"polygon2ejudge/lib/serve_cfg"
 	"strconv"
 )
@@ -29,7 +31,9 @@ type Transaction struct {
 	err            error
 	commitMessages []string
 
-	tmpPath string
+	tmpPath       string
+	ejudgeSession *ejudge_session.TEjudgeSession
+	noChange      bool
 }
 
 func NewTransaction(contestID int) *Transaction {
@@ -54,13 +58,13 @@ func NewTransaction(contestID int) *Transaction {
 		if err != nil {
 			transaction.err = fmt.Errorf("can not clear tmp path %s, err: %s", transaction.tmpPath, err.Error())
 		}
-		err = os.Mkdir(transaction.tmpPath, 0774)
-		if err != nil {
-			transaction.err = fmt.Errorf("can not create tmp path %s, err: %s", transaction.tmpPath, err.Error())
-		}
 	}
 
 	return transaction
+}
+
+func (t *Transaction) SetNoChange() {
+	t.noChange = true
 }
 
 func (t *Transaction) GetTmp() (string, error) {
@@ -76,6 +80,21 @@ func (t *Transaction) EditServeCfg() (*serve_cfg.ServeCFG, error) {
 		return nil, t.err
 	}
 	return t.current.ServeCfg, nil
+}
+
+func (t *Transaction) GetEjudgeSession() (*ejudge_session.TEjudgeSession, error) {
+	if t.setupCurrent() != nil {
+		return nil, t.err
+	}
+	if t.ejudgeSession == nil {
+		session, err := ejudge_session.NewEjudgeSession(t.current.ServeCfg.ContestID)
+		if err != nil {
+			t.err = fmt.Errorf("can not connect to ejudge, error: %s", err.Error())
+		} else {
+			t.ejudgeSession = session
+		}
+	}
+	return t.ejudgeSession, t.err
 }
 
 func (t *Transaction) RemovePath(path string) error {
@@ -116,34 +135,41 @@ func (t *Transaction) Commit(commitMessage string) error {
 	if t.err != nil {
 		return t.err
 	}
+	t.commitMessages = append(t.commitMessages, commitMessage)
 	if t.current == nil {
 		return nil
 	}
 	t.applied.ServeCfg = t.current.ServeCfg
 	t.applied.RemovePaths = append(t.applied.RemovePaths, t.current.RemovePaths...)
 	t.applied.MovePaths = append(t.applied.MovePaths, t.current.MovePaths...)
-	t.commitMessages = append(t.commitMessages, commitMessage)
+	t.current = nil
 	return nil
 }
 
 func (t *Transaction) Finish() {
 	if t.err != nil {
+		color.Set(color.FgRed)
 		fmt.Printf("polygon2ejudge finished with error: %s\n", t.err.Error())
+		color.Unset()
 		if len(t.commitMessages) > 0 {
+			color.Set(color.Bold)
 			fmt.Println("Some changes were successful:")
 			for _, message := range t.commitMessages {
 				fmt.Println(message)
 			}
+			color.Unset()
 
 			if console.YesOrNo("Apply them?") {
 				t.apply()
 			}
 		}
 	} else {
+		color.Set(color.Bold)
 		fmt.Println("Finished successfully:")
 		for _, message := range t.commitMessages {
 			fmt.Println(message)
 		}
+		color.Unset()
 
 		t.apply()
 	}
@@ -155,6 +181,10 @@ func (t *Transaction) Finish() {
 }
 
 func (t *Transaction) apply() {
+	if t.noChange {
+		return
+	}
+	color.Set(color.FgHiBlack)
 	fmt.Println("Applying changes")
 
 	err := t.applied.ServeCfg.Write()
@@ -199,7 +229,8 @@ func (t *Transaction) setupCurrent() error {
 			ServeCfg:    t.applied.ServeCfg.Clone(),
 			TmpPath:     filepath.Join(t.tmpPath, strconv.Itoa(len(t.commitMessages))),
 		}
-		return os.Mkdir(t.current.TmpPath, 0774)
+		t.err = os.MkdirAll(t.current.TmpPath, 0774)
+		return t.err
 	}
 	return nil
 }

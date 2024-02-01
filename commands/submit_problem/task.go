@@ -1,4 +1,4 @@
-package remove_problem
+package submit_problem
 
 import (
 	"github.com/hellflame/argparse"
@@ -6,32 +6,32 @@ import (
 	transaction2 "polygon2ejudge/lib/transaction"
 )
 
-type RemoveTask struct {
+type SubmitTask struct {
 	common.TaskCommon
-	EjudgeProblemId *int
+	ProblemId *int
 
 	Transaction *transaction2.Transaction
-
-	KeepServeCfg bool
 }
 
-func AddRemoveProblemCommand(parser *argparse.Parser) {
-	task := &RemoveTask{}
-	rp := parser.AddCommand("rp", "Remove single problem from ejudge contest", nil)
-	task.AddCommonOptions(rp, false, false)
-	task.EjudgeProblemId = rp.Int("", "problem_id", &argparse.Option{
+func AddSubmitProblemCommand(parser *argparse.Parser) {
+	task := &SubmitTask{}
+	sp := parser.AddCommand("sp", "Submit solutions for single problem", nil)
+	task.AddCommonOptions(sp, false, true)
+
+	task.ProblemId = sp.Int("", "problem_id", &argparse.Option{
 		Help:       "Ejudge id for the problem",
 		Required:   true,
 		Positional: true,
 	})
 
-	rp.InvokeAction = func(invoked bool) {
+	sp.InvokeAction = func(invoked bool) {
 		if !invoked {
 			return
 		}
 		transaction := transaction2.NewTransaction(*task.ContestId)
+		transaction.SetNoChange()
 		task.Transaction = transaction
-		task.RemoveProblem()
+		task.SubmitProblem()
 		transaction.Finish()
 	}
 }

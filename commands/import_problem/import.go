@@ -13,7 +13,7 @@ func (t *ImportTask) ImportProblem() {
 	}()
 
 	t.addDeferFunc(func() {
-		t.Transaction.Commit(fmt.Sprintf("Imported problem %d name: %s", *t.PolygonProbId, t.internalName))
+		t.Transaction.Commit(fmt.Sprintf("Imported problem %s", t.internalName))
 	})
 
 	var err error

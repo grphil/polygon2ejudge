@@ -1,6 +1,7 @@
 package import_problem
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,10 +15,17 @@ func (t *ImportTask) importPackage() error {
 		return err
 	}
 
-	fmt.Printf("downloading package for problem %d\n", *t.PolygonProbId)
-	err = polygon_api.ImportPackage(*t.PolygonProbId, t.packagePath)
+	fmt.Println("downloading problem package")
+	if t.PolygonProbUrl != nil {
+		err = polygon_api.ImportPackage(*t.PolygonProbUrl, t.packagePath)
+	} else if t.PolygonProbID != nil {
+		err = polygon_api.ImportPackageApi(*t.PolygonProbID, t.packagePath)
+	} else {
+		return errors.New("no problem id or url provided")
+	}
+
 	if err != nil {
-		return fmt.Errorf("polygon api error while loading package: %s", err.Error())
+		return fmt.Errorf("polygon error while loading package: %s", err.Error())
 	}
 
 	return nil

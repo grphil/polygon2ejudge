@@ -2,24 +2,29 @@ package config
 
 import (
 	"errors"
+	"github.com/go-resty/resty/v2"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
 	"polygon2ejudge/lib/console"
 )
 
-const UserConfigVersion = "user.1"
+const UserConfigVersion = "user.2"
 
 type TUserConfig struct {
 	Version string `yaml:"version"`
 
-	ApiKey    string `yaml:"api_key"`
-	ApiSecret string `yaml:"api_secret"`
+	ApiKey          string `yaml:"api_key"`
+	ApiSecret       string `yaml:"api_secret"`
+	PolygonLogin    string `yaml:"polygon_login"`
+	PolygonPassword string `yaml:"polygon_password"`
 
 	EjudgeLogin    string `yaml:"ejudge_login"`
 	EjudgePassword string `yaml:"ejudge_password"`
 
 	NolintString string `yaml:"nolint_string"`
+
+	polygonClient *resty.Client `yaml:"-"`
 }
 
 var UserConfig *TUserConfig
@@ -33,6 +38,7 @@ func init() {
 		} else {
 			panic(err)
 		}
+		return
 	}
 
 	confFileData, err := os.ReadFile(confPath)
@@ -47,6 +53,7 @@ func init() {
 
 	if userConfig.Version != UserConfigVersion {
 		ResetUserConfig()
+		return
 	}
 
 	UserConfig = userConfig
@@ -62,10 +69,12 @@ func ResetUserConfig() {
 		Version: UserConfigVersion,
 	}
 
-	UserConfig.ApiKey = console.ReadValue("Enter polygon api key:")
-	UserConfig.ApiSecret = console.ReadSecret("Enter polygon api secret:")
+	UserConfig.ApiKey = console.ReadValue("Enter polygon api key: (used only for backward compatibility, you can leave empty if you will not update old imported problems)")
+	UserConfig.ApiSecret = console.ReadSecret("Enter polygon api secret: (used only for backward compatibility, you can leave empty if you will not update old imported problems)")
+	UserConfig.PolygonLogin = console.ReadValue("Enter polygon login:")
+	UserConfig.PolygonPassword = console.ReadSecret("Enter polygon password:")
 	UserConfig.EjudgeLogin = console.ReadValue("Enter ejudge login:")
-	UserConfig.EjudgePassword = console.ReadValue("Enter ejudge password:")
+	UserConfig.EjudgePassword = console.ReadSecret("Enter ejudge password:")
 	UserConfig.NolintString = console.ReadValue("Enter nolint string (will be added before all submitted solutions). Leave empty for no nolint string")
 
 	outputFile, err := os.OpenFile(getUserConfigPath(), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)

@@ -40,7 +40,9 @@ func (t *RemoveTask) RemoveProblem() {
 		}
 	}
 
-	delete(serveCFG.Problems, *t.EjudgeProblemId)
+	if !t.KeepServeCfg {
+		delete(serveCFG.Problems, *t.EjudgeProblemId)
+	}
 	err = t.Transaction.RemovePath(filepath.Join(serveCFG.Path(), "problems", internalName))
 	if err != nil {
 		return

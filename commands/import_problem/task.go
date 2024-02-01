@@ -11,9 +11,11 @@ import (
 
 type ImportTask struct {
 	common.TaskCommon
-	PolygonProbId *int
-	ShortName     *string
-	EjudgeId      *int
+	PolygonProbUrl *string
+	ShortName      *string
+	EjudgeId       *int
+
+	PolygonProbID *int // only for backward compatability for update
 
 	Transaction *transaction2.Transaction
 
@@ -42,17 +44,17 @@ type ImportTask struct {
 
 func AddImportProblemCommand(parser *argparse.Parser) {
 	task := &ImportTask{}
-	ic := parser.AddCommand("ip", "Import single problem from polygon", nil)
-	task.AddCommonOptions(ic, true)
-	task.PolygonProbId = ic.Int("", "problem_id", &argparse.Option{
-		Help:       "Polygon id for the problem",
+	ip := parser.AddCommand("ip", "Import single problem from polygon", nil)
+	task.AddCommonOptions(ip, true, false)
+	task.PolygonProbUrl = ip.String("", "problem_url", &argparse.Option{
+		Help:       "Polygon url for the problem (example: \"https://polygon.codeforces.com/p85dIBF/mmirzayanov/a-plus-b\")",
 		Required:   true,
 		Positional: true,
 	})
-	task.ShortName = ic.String("", "short", &argparse.Option{Help: "Short name for the problem"})
-	task.EjudgeId = ic.Int("", "ej-id", &argparse.Option{Help: "Ejudge id for the problem", Default: "-1"})
+	task.ShortName = ip.String("", "short", &argparse.Option{Help: "Short name for the problem"})
+	task.EjudgeId = ip.Int("", "ej-id", &argparse.Option{Help: "Ejudge id for the problem", Default: "-1"})
 
-	ic.InvokeAction = func(invoked bool) {
+	ip.InvokeAction = func(invoked bool) {
 		if !invoked {
 			return
 		}

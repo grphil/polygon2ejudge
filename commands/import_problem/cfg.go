@@ -33,7 +33,7 @@ func (t *ImportTask) fillInConfig() error {
 
 	t.setNames()
 
-	t.config.Set("extid", fmt.Sprintf("polygon:%d", *t.PolygonProbId))
+	t.config.Set("extid", *t.PolygonProbUrl)
 	t.problemOnlyConfig.Set("revision", t.problemXML.Revision)
 
 	t.config.Set("use_stdin", true)
@@ -175,7 +175,10 @@ func (t *ImportTask) setLimits() error {
 func (t *ImportTask) setNames() error {
 	shortNames := make(map[string]bool)
 	internalNames := make(map[string]bool)
-	for _, prob := range t.serveCFG.Problems {
+	for i, prob := range t.serveCFG.Problems {
+		if i == *t.EjudgeId {
+			continue
+		}
 		shortNames[prob.GetStr("short_name")] = true
 		internalNames[prob.GetStr("internal_name")] = true
 	}
@@ -263,7 +266,7 @@ func (t *ImportTask) exportConfig() {
 	t.problemOnlyConfig.Update(t.config)
 
 	b := &bytes.Buffer{}
-	b.WriteString("# -*- coding: utf-8 -*-\\n\\n[problem]\n")
+	b.WriteString("# -*- coding: utf-8 -*-\n\n[problem]\n")
 	t.problemOnlyConfig.Write(b)
 
 	err := os.WriteFile(
@@ -279,9 +282,6 @@ func (t *ImportTask) exportConfig() {
 
 func getFileName(s XSource) string {
 	file := filepath.Base(s.Path)
-	dotPos := strings.Index(file, ".")
-	if dotPos != -1 {
-		return file[:dotPos]
-	}
-	return file
+	ext := filepath.Ext(s.Path)
+	return file[:len(file)-len(ext)]
 }

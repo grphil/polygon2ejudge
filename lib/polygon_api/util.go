@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"encoding/hex"
+	"github.com/go-resty/resty/v2"
 	"net/url"
 	"polygon2ejudge/lib/config"
 	"strconv"
 	"time"
 )
 
-func fixValues(method string, values url.Values) url.Values {
+func fixApiValues(method string, values url.Values) url.Values {
 	tm := time.Now().Unix()
 	values.Set("time", strconv.FormatInt(tm, 10))
 	values.Set("apiKey", config.UserConfig.ApiKey)
@@ -29,4 +30,17 @@ func fixValues(method string, values url.Values) url.Values {
 
 	values.Set("apiSig", rand+hex.EncodeToString(endoded[:]))
 	return values
+}
+
+const kRetryCount = 10
+
+func newPostRequest() *resty.Request {
+	c := resty.New()
+	c.SetFormData(map[string]string{
+		"login":    config.UserConfig.PolygonLogin,
+		"password": config.UserConfig.PolygonPassword,
+	})
+	c.SetRetryCount(kRetryCount)
+	c.SetRetryMaxWaitTime(time.Second * time.Duration(129))
+	return c.R()
 }
