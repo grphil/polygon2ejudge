@@ -185,6 +185,7 @@ func (t *Transaction) apply() {
 		return
 	}
 	color.Set(color.FgHiBlack)
+	defer color.Unset()
 	fmt.Println("Applying changes")
 
 	err := t.applied.ServeCfg.Write()
