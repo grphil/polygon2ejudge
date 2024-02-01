@@ -102,6 +102,7 @@ func fixLatex(content string) string {
 				continue
 			}
 			if balance > 0 && cmp(i, "\\\\") {
+				c.WriteRune(' ')
 				i++
 				continue
 			}
