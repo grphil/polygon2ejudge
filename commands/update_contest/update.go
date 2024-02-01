@@ -1,6 +1,9 @@
 package update_contest
 
-import "polygon2ejudge/commands/update_problem"
+import (
+	"polygon2ejudge/commands/update_problem"
+	"slices"
+)
 
 func (t *UpdateTask) UpdateContest() {
 	serveCfg, err := t.Transaction.EditServeCfg()
@@ -15,6 +18,8 @@ func (t *UpdateTask) UpdateContest() {
 			problems = append(problems, probID)
 		}
 	}
+
+	slices.Sort(problems)
 
 	for _, probID := range problems {
 		task := &update_problem.UpdateTask{

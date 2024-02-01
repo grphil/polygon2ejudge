@@ -131,7 +131,7 @@ func (t *ImportTask) processGroups(
 	valuerOptions.Set("open_tests", strings.Join(openTests, ", "))
 	valuerOptions.Set("final_open_tests", strings.Join(finalOpenTests, ", "))
 	if !acm {
-		t.serveCFG.Global.Set("separate_user_score", 1)
+		t.serveCFG.Global.Set("separate_user_score", true)
 
 		valuerOptions.Set("full_score", fullScore)
 		valuerOptions.Set("full_user_score", userScore)

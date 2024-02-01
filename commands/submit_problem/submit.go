@@ -1,9 +1,11 @@
 package submit_problem
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -58,6 +60,11 @@ func (t *SubmitTask) SubmitProblem() {
 				t.Transaction.SetError(fmt.Errorf("can not list solutions for problem %d, error: %s", *t.ProblemId, err.Error()))
 				return
 			}
+
+			slices.SortFunc(files, func(a os.DirEntry, b os.DirEntry) int {
+				return cmp.Compare(a.Name(), b.Name())
+			})
+
 			for _, f := range files {
 				if f.IsDir() {
 					continue
@@ -86,5 +93,5 @@ func getSolutionsDir(probDir string) (string, bool) {
 
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
-	return err != nil
+	return err == nil
 }

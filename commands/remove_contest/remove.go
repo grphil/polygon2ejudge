@@ -2,6 +2,7 @@ package remove_contest
 
 import (
 	"polygon2ejudge/commands/remove_problem"
+	"slices"
 )
 
 func (t *RemoveTask) RemoveContest() {
@@ -15,6 +16,8 @@ func (t *RemoveTask) RemoveContest() {
 	for probID, _ := range serveCFG.Problems {
 		problems = append(problems, probID)
 	}
+
+	slices.Sort(problems)
 
 	for _, probID := range problems {
 		task := remove_problem.RemoveTask{
