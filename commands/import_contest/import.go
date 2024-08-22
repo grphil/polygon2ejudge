@@ -6,17 +6,6 @@ import (
 	"polygon2ejudge/lib/polygon_api"
 )
 
-const englishLetters = 26
-
-// It's a temporary solution, waiting for Polygon API changes.
-func getShortName(id int) string {
-	if id < englishLetters {
-		return string('A' + id)
-	}
-
-	return "Z" + getShortName(id-englishLetters)
-}
-
 func (t *ImportTask) ImportContest() {
 	problems, err := polygon_api.GetProblemsInContest(*t.PolygonContestId)
 	if err != nil {
@@ -31,14 +20,14 @@ func (t *ImportTask) ImportContest() {
 		return
 	}
 
-	for i, prob := range problems {
-		shortName := getShortName(i)
+	for short, prob := range problems {
+		short := short
 		defaultEjudgeID := -1
 
 		task := &import_problem.ImportTask{
 			TaskCommon:    t.TaskCommon,
 			PolygonProbID: &prob.ID,
-			ShortName:     &shortName,
+			ShortName:     &short,
 			EjudgeId:      &defaultEjudgeID,
 			Transaction:   t.Transaction,
 		}

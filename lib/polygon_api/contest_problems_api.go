@@ -26,12 +26,13 @@ type PSingleProblem struct {
 }
 
 type PProblemsList struct {
-	Status  string            `json:"status"`
-	Comment string            `json:"comment"`
-	Result  []*PSingleProblem `json:"result"`
+	Status  string                     `json:"status"`
+	Comment string                     `json:"comment"`
+	Result  map[string]*PSingleProblem `json:"result"`
 }
 
-func GetProblemsInContest(contestID int) ([]*PSingleProblem, error) {
+// Problem idx (A, B, C) -> Problem.
+func GetProblemsInContest(contestID int) (map[string]*PSingleProblem, error) {
 	values := url.Values{}
 	values.Set("contestId", strconv.Itoa(contestID))
 	values = fixApiValues(CONTEST_METHOD, values)
