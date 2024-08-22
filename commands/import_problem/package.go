@@ -16,10 +16,10 @@ func (t *ImportTask) importPackage() error {
 	}
 
 	fmt.Println("downloading problem package")
-	if t.PolygonProbUrl != nil {
-		err = polygon_api.ImportPackage(*t.PolygonProbUrl, t.packagePath)
-	} else if t.PolygonProbID != nil {
+	if t.PolygonProbID != nil {
 		err = polygon_api.ImportPackageApi(*t.PolygonProbID, t.packagePath)
+	} else if t.PolygonProbUrl != nil { // TODO: wait for fix from Mike
+		err = polygon_api.ImportPackage(*t.PolygonProbUrl, t.packagePath)
 	} else {
 		return errors.New("no problem id or url provided")
 	}

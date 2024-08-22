@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"encoding/hex"
-	"github.com/go-resty/resty/v2"
 	"net/url"
 	"polygon2ejudge/lib/config"
 	"strconv"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 func fixApiValues(method string, values url.Values) url.Values {
