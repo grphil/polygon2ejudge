@@ -33,7 +33,11 @@ func (t *ImportTask) fillInConfig() error {
 
 	t.setNames()
 
-	t.config.Set("extid", *t.PolygonProbUrl)
+	if t.PolygonProbID != nil {
+		t.config.Set("extid", fmt.Sprintf("polygon:%d", *t.PolygonProbID))
+	} else {
+		t.config.Set("extid", *t.PolygonProbUrl)
+	}
 	t.problemOnlyConfig.Set("revision", t.problemXML.Revision)
 
 	t.config.Set("use_stdin", true)

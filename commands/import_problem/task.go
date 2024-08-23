@@ -2,16 +2,17 @@ package import_problem
 
 import (
 	"archive/zip"
-	"github.com/hellflame/argparse"
 	"polygon2ejudge/commands/common"
 	"polygon2ejudge/lib/orderedmap"
 	"polygon2ejudge/lib/serve_cfg"
 	transaction2 "polygon2ejudge/lib/transaction"
+
+	"github.com/hellflame/argparse"
 )
 
 type ImportTask struct {
 	common.TaskCommon
-	PolygonProbUrl *string
+	PolygonProbUrl *string // unused now cause 403
 	ShortName      *string
 	EjudgeId       *int
 
@@ -46,8 +47,8 @@ func AddImportProblemCommand(parser *argparse.Parser) {
 	task := &ImportTask{}
 	ip := parser.AddCommand("ip", "Import single problem from polygon", nil)
 	task.AddCommonOptions(ip, true, false)
-	task.PolygonProbUrl = ip.String("", "problem_url", &argparse.Option{
-		Help:       "Polygon url for the problem (example: \"https://polygon.codeforces.com/p85dIBF/mmirzayanov/a-plus-b\")",
+	task.PolygonProbID = ip.Int("", "problem_id", &argparse.Option{
+		Help:       "Polygon problem ID",
 		Required:   true,
 		Positional: true,
 	})

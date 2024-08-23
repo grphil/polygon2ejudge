@@ -57,10 +57,9 @@ func (t *UpdateTask) UpdateProblem() {
 		Transaction: t.Transaction,
 	}
 
-	if len(problemUrl) > 0 {
+	if problemUrl != "" {
 		importTask.PolygonProbUrl = &problemUrl
-	} else {
-		importTask.PolygonProbID = &polygonID
 	}
+	importTask.PolygonProbID = &polygonID
 	importTask.ImportProblem()
 }

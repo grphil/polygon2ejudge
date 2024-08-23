@@ -3,10 +3,12 @@ package polygon_api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-resty/resty/v2"
+	"net/http"
 	"net/url"
 	"polygon2ejudge/lib/config"
 	"strconv"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const PACKAGES_METHOD = "problem.packages"
@@ -72,7 +74,7 @@ func getPackages(probID string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if res.StatusCode() != 200 {
+	if res.StatusCode() != http.StatusOK {
 		return 0, fmt.Errorf("exit code %d, body: %s", res.StatusCode(), res.String())
 	}
 
