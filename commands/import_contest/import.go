@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"polygon2ejudge/commands/import_problem"
 	"polygon2ejudge/lib/polygon_api"
+	"sort"
 )
 
 func (t *ImportTask) ImportContest() {
@@ -19,9 +20,15 @@ func (t *ImportTask) ImportContest() {
 	if err != nil {
 		return
 	}
+	shorts := make([]string, 0, len(problems))
+	for short := range problems {
+		shorts = append(shorts, short)
+	}
+	sort.Strings(shorts)
 
-	for short, prob := range problems {
+	for _, short := range shorts {
 		short := short
+		prob := problems[short]
 		defaultEjudgeID := -1
 
 		task := &import_problem.ImportTask{
