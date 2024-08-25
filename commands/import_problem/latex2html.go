@@ -41,7 +41,7 @@ func (t *ImportTask) latex2HTML(f string) (string, error) {
 		return "", err
 	}
 
-	content := fixLatex(string(contentB))
+	content := t.fixLatex(string(contentB))
 
 	texPath := filepath.Join(tmpPath, "a.tex")
 	err = os.WriteFile(texPath, []byte(content), 0664)
@@ -63,7 +63,12 @@ func (t *ImportTask) latex2HTML(f string) (string, error) {
 	return string(html), nil
 }
 
-func fixLatex(content string) string {
+func (t *ImportTask) fixLatex(content string) string {
+	for strings.Contains(content, "\\input") {
+		content = t.processTexInput(content)
+		fmt.Println(content)
+	}
+
 	content = strings.ReplaceAll(content, "\\t{", "\\texttt{")
 	content = strings.ReplaceAll(content, "<<", "«")
 	content = strings.ReplaceAll(content, ">>", "»")
@@ -120,6 +125,35 @@ func fixLatex(content string) string {
 	}
 
 	return c.String()
+}
+
+func (t *ImportTask) processTexInput(content string) string {
+	inputPos := strings.Index(content, "\\input")
+	contentPrefix := content[:inputPos]
+	contentSuffix := content[inputPos+6:]
+
+	if len(contentSuffix) == 0 || contentSuffix[0] != '{' {
+		return contentPrefix + contentSuffix
+	}
+
+	fileEndIndex := strings.Index(contentSuffix, "}")
+	if fileEndIndex == -1 {
+		return contentPrefix + contentSuffix
+	}
+
+	fileName := contentSuffix[1:fileEndIndex]
+	contentSuffix = contentSuffix[fileEndIndex+1:]
+
+	if !strings.HasSuffix(fileName, ".tex") {
+		fileName += ".tex"
+	}
+
+	inputFileContentB, err := os.ReadFile(filepath.Join(t.statementPath, fileName))
+	if err != nil {
+		return contentPrefix + contentSuffix
+	}
+
+	return contentPrefix + "\n\n" + string(inputFileContentB) + "\n\n" + contentSuffix
 }
 
 const kStyle = "width: auto; max-width: max(50%, 400px); height: auto; max-height: 100%;"
