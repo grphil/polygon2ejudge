@@ -15,7 +15,7 @@ type RemoveTask struct {
 func AddRemoveContestCommand(parser *argparse.Parser) {
 	task := &RemoveTask{}
 	rc := parser.AddCommand("rc", "Remove all problems from ejudge contest", nil)
-	task.AddCommonOptions(rc, false, false)
+	task.AddCommonOptions(rc, false, false, false)
 
 	rc.InvokeAction = func(invoked bool) {
 		if !invoked {

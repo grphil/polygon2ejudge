@@ -14,10 +14,10 @@ import (
 )
 
 func (t *ImportTask) buildValuer() error {
-	acm := t.serveCFG.Global.GetStr("score_system") == "acm"
+	acm := t.ServeCFG.Global.GetStr("score_system") == "acm"
 	err := t.processTests(acm)
 	if err != nil {
-		return fmt.Errorf("%s error while processing tests %s", t.internalName, err.Error())
+		return fmt.Errorf("%s error while processing tests %s", t.InternalName, err.Error())
 	}
 
 	valuerOptions := orderedmap.New()
@@ -131,7 +131,7 @@ func (t *ImportTask) processGroups(
 	valuerOptions.Set("open_tests", strings.Join(openTests, ", "))
 	valuerOptions.Set("final_open_tests", strings.Join(finalOpenTests, ", "))
 	if !acm {
-		t.serveCFG.Global.Set("separate_user_score", true)
+		t.ServeCFG.Global.Set("separate_user_score", true)
 
 		valuerOptions.Set("full_score", fullScore)
 		valuerOptions.Set("full_user_score", userScore)
@@ -160,7 +160,7 @@ func (t *ImportTask) processGroups(
 		}
 		valuerW.Close()
 
-		err = t.Transaction.MovePath(valuerPath, filepath.Join(t.serveCFG.Path(), "problems", "gvaluer"))
+		err = t.Transaction.MovePath(valuerPath, filepath.Join(t.ServeCFG.Path(), "problems", "gvaluer"))
 		if err != nil {
 			return err
 		}
@@ -170,7 +170,7 @@ func (t *ImportTask) processGroups(
 
 	valuerOptions.WritePrefix(valuerCFG, "# ")
 	err := os.WriteFile(
-		filepath.Join(t.probDir, "valuer.cfg"),
+		filepath.Join(t.ProbDir, "valuer.cfg"),
 		valuerCFG.Bytes(),
 		0664,
 	)

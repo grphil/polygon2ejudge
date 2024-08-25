@@ -16,17 +16,19 @@ type ImportTask struct {
 	ShortName      *string
 	EjudgeId       *int
 
-	PolygonProbID *int // only for backward compatability for update
+	StatementsOnly bool
+
+	PolygonProbID *int
 
 	Transaction *transaction2.Transaction
 
 	tmpDir      string
 	packagePath string
-	probDir     string
+	ProbDir     string
 
-	internalName string
+	InternalName string
 
-	serveCFG   *serve_cfg.ServeCFG
+	ServeCFG   *serve_cfg.ServeCFG
 	problemXML *XProblemXML
 	testset    *XTestset
 
@@ -46,7 +48,7 @@ type ImportTask struct {
 func AddImportProblemCommand(parser *argparse.Parser) {
 	task := &ImportTask{}
 	ip := parser.AddCommand("ip", "Import single problem from polygon", nil)
-	task.AddCommonOptions(ip, true, false)
+	task.AddCommonOptions(ip, true, false, true)
 	task.PolygonProbID = ip.Int("", "problem_id", &argparse.Option{
 		Help:       "Polygon problem ID",
 		Required:   true,

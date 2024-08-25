@@ -69,13 +69,13 @@ func ResetUserConfig() {
 		Version: UserConfigVersion,
 	}
 
-	UserConfig.ApiKey = console.ReadValue("Enter polygon api key: (used only for backward compatibility, you can leave empty if you will not update old imported problems)")
-	UserConfig.ApiSecret = console.ReadSecret("Enter polygon api secret: (used only for backward compatibility, you can leave empty if you will not update old imported problems)")
+	UserConfig.ApiKey = console.ReadValue("Enter polygon api key:")
+	UserConfig.ApiSecret = console.ReadSecret("Enter polygon api secret:")
 	UserConfig.PolygonLogin = console.ReadValue("Enter polygon login:")
 	UserConfig.PolygonPassword = console.ReadSecret("Enter polygon password:")
 	UserConfig.EjudgeLogin = console.ReadValue("Enter ejudge login:")
 	UserConfig.EjudgePassword = console.ReadSecret("Enter ejudge password:")
-	UserConfig.NolintString = console.ReadValue("Enter nolint string (will be added before all submitted solutions). Leave empty for no nolint string")
+	UserConfig.NolintString = console.ReadValue("Enter nolint string (will be added before all submitted solutions from judge). Leave empty for no nolint string")
 
 	outputFile, err := os.OpenFile(getUserConfigPath(), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {

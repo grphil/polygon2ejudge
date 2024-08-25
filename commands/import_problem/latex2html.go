@@ -181,7 +181,7 @@ func (t *ImportTask) fixHTML(s string) (string, error) {
 			imgName := img.Pointer.Attr[i].Val
 			err := copyFile(
 				filepath.Join(t.statementPath, imgName),
-				filepath.Join(t.probDir, "attachments", imgName),
+				filepath.Join(t.ProbDir, "attachments", imgName),
 			)
 			if err != nil {
 				fmt.Printf("Warning: can not process image %s, error: %s", imgName, err.Error())

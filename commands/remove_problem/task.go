@@ -18,7 +18,7 @@ type RemoveTask struct {
 func AddRemoveProblemCommand(parser *argparse.Parser) {
 	task := &RemoveTask{}
 	rp := parser.AddCommand("rp", "Remove single problem from ejudge contest", nil)
-	task.AddCommonOptions(rp, false, false)
+	task.AddCommonOptions(rp, false, false, false)
 	task.EjudgeProblemId = rp.Int("", "problem_id", &argparse.Option{
 		Help:       "Ejudge id for the problem",
 		Required:   true,

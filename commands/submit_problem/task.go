@@ -16,7 +16,7 @@ type SubmitTask struct {
 func AddSubmitProblemCommand(parser *argparse.Parser) {
 	task := &SubmitTask{}
 	sp := parser.AddCommand("sp", "Submit solutions for single problem", nil)
-	task.AddCommonOptions(sp, false, true)
+	task.AddCommonOptions(sp, false, true, false)
 
 	task.ProblemId = sp.Int("", "problem_id", &argparse.Option{
 		Help:       "Ejudge id for the problem",

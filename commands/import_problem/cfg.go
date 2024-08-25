@@ -14,17 +14,20 @@ import (
 
 func (t *ImportTask) fillInConfig() error {
 	if *t.EjudgeId == -1 {
-		id := t.serveCFG.MaxProblemId + 1
+		id := t.ServeCFG.MaxProblemId + 1
 		t.EjudgeId = &id
 	}
-	t.config = t.serveCFG.Problem(*t.EjudgeId)
+	t.config = t.ServeCFG.Problem(*t.EjudgeId)
+	if t.StatementsOnly {
+		return nil
+	}
 	t.problemOnlyConfig = orderedmap.New()
 	t.addDeferFunc(t.exportConfig)
 
 	t.config.Set("id", *t.EjudgeId)
 
 	abstract := t.Abstract
-	if len(*abstract) == 0 && !*t.NoGenericParent && t.serveCFG.HasGeneric {
+	if len(*abstract) == 0 && !*t.NoGenericParent && t.ServeCFG.HasGeneric {
 		abstract = &serve_cfg.GENERIC
 	}
 	if len(*abstract) > 0 {
@@ -89,7 +92,7 @@ func (t *ImportTask) fillInConfig() error {
 }
 
 func (t *ImportTask) setCustomOptions() {
-	file, err := os.Open(filepath.Join(t.probDir, "documents/description.txt"))
+	file, err := os.Open(filepath.Join(t.ProbDir, "documents/description.txt"))
 	if err != nil {
 		return
 	}
@@ -179,7 +182,7 @@ func (t *ImportTask) setLimits() error {
 func (t *ImportTask) setNames() error {
 	shortNames := make(map[string]bool)
 	internalNames := make(map[string]bool)
-	for i, prob := range t.serveCFG.Problems {
+	for i, prob := range t.ServeCFG.Problems {
 		if i == *t.EjudgeId {
 			continue
 		}
@@ -228,11 +231,11 @@ func (t *ImportTask) setNames() error {
 		}
 	}
 	t.config.Set("internal_name", internalName)
-	t.internalName = internalName
+	t.InternalName = internalName
 	if !*t.NoPackageSave {
 		err := t.Transaction.MovePath(
 			t.packagePath,
-			filepath.Join(t.serveCFG.Path(), "download", fmt.Sprintf("%s.zip", t.internalName)),
+			filepath.Join(t.ServeCFG.Path(), "download", fmt.Sprintf("%s.zip", t.InternalName)),
 		)
 		if err != nil {
 			return err
@@ -274,7 +277,7 @@ func (t *ImportTask) exportConfig() {
 	t.problemOnlyConfig.Write(b)
 
 	err := os.WriteFile(
-		filepath.Join(t.probDir, "problem.cfg"),
+		filepath.Join(t.ProbDir, "problem.cfg"),
 		b.Bytes(),
 		0664,
 	)

@@ -12,9 +12,11 @@ func (t *ImportTask) ImportProblem() {
 		}
 	}()
 
-	t.addDeferFunc(func() {
-		t.Transaction.Commit(fmt.Sprintf("Imported problem %s", t.internalName))
-	})
+	if !t.StatementsOnly {
+		t.addDeferFunc(func() {
+			t.Transaction.Commit(fmt.Sprintf("Imported problem %s", t.InternalName))
+		})
+	}
 
 	var err error
 	t.tmpDir, err = t.Transaction.GetTmp()
@@ -22,7 +24,7 @@ func (t *ImportTask) ImportProblem() {
 		return
 	}
 
-	t.serveCFG, err = t.Transaction.EditServeCfg()
+	t.ServeCFG, err = t.Transaction.EditServeCfg()
 	if err != nil {
 		return
 	}
@@ -45,10 +47,12 @@ func (t *ImportTask) ImportProblem() {
 		return
 	}
 
-	err = t.buildValuer()
-	if err != nil {
-		t.Transaction.SetError(err)
-		return
+	if !t.StatementsOnly {
+		err = t.buildValuer()
+		if err != nil {
+			t.Transaction.SetError(err)
+			return
+		}
 	}
 
 	if !*t.NoStatements {
@@ -59,10 +63,12 @@ func (t *ImportTask) ImportProblem() {
 		}
 	}
 
-	t.Transaction.MovePath(
-		t.probDir,
-		filepath.Join(t.serveCFG.Path(), "problems", t.internalName),
-	)
+	if !t.StatementsOnly {
+		t.Transaction.MovePath(
+			t.ProbDir,
+			filepath.Join(t.ServeCFG.Path(), "problems", t.InternalName),
+		)
+	}
 }
 
 func (t *ImportTask) addDeferFunc(f func()) {

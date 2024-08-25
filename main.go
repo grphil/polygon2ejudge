@@ -12,6 +12,7 @@ import (
 	"polygon2ejudge/commands/submit_problem"
 	"polygon2ejudge/commands/update_contest"
 	"polygon2ejudge/commands/update_problem"
+	"polygon2ejudge/commands/update_statements"
 )
 
 func main() {
@@ -22,6 +23,8 @@ func main() {
 
 	update_problem.AddUpdateProblemCommand(parser)
 	update_contest.AddUpdateContestCommand(parser)
+
+	update_statements.AddUpdateStatementsCommand(parser)
 
 	remove_problem.AddRemoveProblemCommand(parser)
 	remove_contest.AddRemoveContestCommand(parser)

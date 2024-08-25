@@ -34,7 +34,7 @@ type TaskCommon struct {
 	NoConvertDprToPas *bool
 }
 
-func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, hasSubmit bool) {
+func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, hasSubmit bool, hasStatement bool) {
 	t.ContestId = parser.Int("", "contest_id", &argparse.Option{
 		Help:       "ID of ejudge contest",
 		Required:   true,
@@ -47,6 +47,15 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, h
 		})
 		t.NoLint = parser.Flag("l", "no-lint", &argparse.Option{
 			Help: "Add nolint string to solutions",
+		})
+	}
+
+	if hasStatement {
+		t.NoHtmlStatements = parser.Flag("", "no-html-statements", &argparse.Option{
+			Help: "Do not generate html statements (pdf statements will be generated)",
+		})
+		t.AllLanguages = parser.Flag("l", "all-languages", &argparse.Option{
+			Help: "Add pdf statements for all languages",
 		})
 	}
 
@@ -64,12 +73,6 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, h
 
 		t.NoStatements = parser.Flag("", "no-statements", &argparse.Option{
 			Help: "Do not generate any statements (pdf and html)",
-		})
-		t.NoHtmlStatements = parser.Flag("", "no-html-statements", &argparse.Option{
-			Help: "Do not generate html statements (pdf statements will be generated)",
-		})
-		t.AllLanguages = parser.Flag("l", "all-languages", &argparse.Option{
-			Help: "Add pdf statements for all languages",
 		})
 
 		t.NoCompileMainSolution = parser.Flag("m", "no-compile-main", &argparse.Option{
@@ -99,6 +102,19 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, h
 		t.NoConvertDprToPas = parser.Flag("", "no-dpr-to-pas", &argparse.Option{
 			Help: "Do not change extension of all .dpr files to .pas",
 		})
+	} else {
+		t.Abstract = new(string)
+		t.NoGenericParent = new(bool)
+		t.NoOffline = new(bool)
+		t.NoStatements = new(bool)
+		t.NoCompileMainSolution = new(bool)
+		t.CompileAllSolutions = new(bool)
+		t.NoTextareaInput = new(bool)
+		t.NoCustomRun = new(bool)
+		t.NoPackageSave = new(bool)
+		t.AllowFullReport = new(bool)
+		t.FullReportSamplesAcm = new(bool)
+		t.NoConvertDprToPas = new(bool)
 	}
 
 }

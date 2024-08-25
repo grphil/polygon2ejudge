@@ -15,7 +15,7 @@ type UpdateTask struct {
 func AddUpdateContestCommand(parser *argparse.Parser) {
 	task := &UpdateTask{}
 	uc := parser.AddCommand("uc", "Update all tasks in ejudge contest", nil)
-	task.AddCommonOptions(uc, true, false)
+	task.AddCommonOptions(uc, true, false, true)
 
 	uc.InvokeAction = func(invoked bool) {
 		if !invoked {

@@ -15,7 +15,7 @@ type SubmitTask struct {
 func AddSubmitContestCommand(parser *argparse.Parser) {
 	task := &SubmitTask{}
 	sc := parser.AddCommand("sc", "Submit solutions for all problems in contest", nil)
-	task.AddCommonOptions(sc, false, true)
+	task.AddCommonOptions(sc, false, true, false)
 
 	sc.InvokeAction = func(invoked bool) {
 		if !invoked {

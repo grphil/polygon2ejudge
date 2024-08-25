@@ -26,7 +26,7 @@ func (t *ImportTask) generateStatements() error {
 		return fmt.Errorf("can not generate statements xml, error: %s", err.Error())
 	}
 
-	err = os.WriteFile(filepath.Join(t.probDir, "statements.xml"), xml, 0664)
+	err = os.WriteFile(filepath.Join(t.ProbDir, "statements.xml"), xml, 0664)
 	if err != nil {
 		return fmt.Errorf("can not write statements xml, error: %s", err.Error())
 	}
@@ -79,7 +79,7 @@ func (t *ImportTask) generateHTMLStatements() {
 	}
 
 	t.statement.Statement = &EjudgeStatement{}
-	t.statementPath = filepath.Join(t.probDir, "statement-sections", s.Language)
+	t.statementPath = filepath.Join(t.ProbDir, "statement-sections", s.Language)
 
 	err = t.ProcessHTMLStatementsFiles()
 	if err != nil {

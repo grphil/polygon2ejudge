@@ -1,4 +1,4 @@
-package update_problem
+package update_statements
 
 import (
 	"github.com/hellflame/argparse"
@@ -13,23 +13,23 @@ type UpdateTask struct {
 	Transaction     *transaction2.Transaction
 }
 
-func AddUpdateProblemCommand(parser *argparse.Parser) {
+func AddUpdateStatementsCommand(parser *argparse.Parser) {
 	task := &UpdateTask{}
-	up := parser.AddCommand("up", "Update single problem", nil)
-	task.AddCommonOptions(up, true, false, true)
-	task.EjudgeProblemId = up.Int("", "problem_id", &argparse.Option{
+	us := parser.AddCommand("us", "Update problem statements", nil)
+	task.AddCommonOptions(us, false, false, true)
+	task.EjudgeProblemId = us.Int("", "problem_id", &argparse.Option{
 		Help:       "Ejudge id for the problem",
 		Required:   true,
 		Positional: true,
 	})
 
-	up.InvokeAction = func(invoked bool) {
+	us.InvokeAction = func(invoked bool) {
 		if !invoked {
 			return
 		}
 		transaction := transaction2.NewTransaction(*task.ContestId)
 		task.Transaction = transaction
-		task.UpdateProblem()
+		task.UpdateProblemStatements()
 		transaction.Finish()
 	}
 }

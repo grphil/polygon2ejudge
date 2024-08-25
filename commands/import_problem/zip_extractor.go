@@ -27,8 +27,8 @@ func (t *ImportTask) extractProblemFiles() error {
 		t.archive.Close()
 	})
 
-	t.probDir = filepath.Join(t.tmpDir, "problem")
-	err = os.MkdirAll(filepath.Dir(t.probDir), 0774)
+	t.ProbDir = filepath.Join(t.tmpDir, "problem")
+	err = os.MkdirAll(filepath.Dir(t.ProbDir), 0774)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (t *ImportTask) extractProblemFiles() error {
 		return err
 	}
 
-	probXMLData, err := os.ReadFile(filepath.Join(t.probDir, "problem.xml"))
+	probXMLData, err := os.ReadFile(filepath.Join(t.ProbDir, "problem.xml"))
 	if err != nil {
 		return err
 	}
@@ -52,6 +52,10 @@ func (t *ImportTask) extractProblemFiles() error {
 
 	fmt.Printf("Parsed problem.xml for problem %s\n", t.problemXML.ShortName)
 	t.PolygonProbUrl = &t.problemXML.Url
+
+	if t.StatementsOnly {
+		return nil
+	}
 
 	err = t.extractSolutions()
 	if err != nil {
@@ -93,8 +97,8 @@ func (t *ImportTask) extractSolutions() error {
 		if solution.Tag == "main" {
 			name := filepath.Base(solution.Source.Path)
 			err = copyFile(
-				filepath.Join(t.probDir, solutionsPath, name),
-				filepath.Join(t.probDir, name),
+				filepath.Join(t.ProbDir, solutionsPath, name),
+				filepath.Join(t.ProbDir, name),
 			)
 		}
 
@@ -137,7 +141,7 @@ func (t *ImportTask) extractAllFiles(prefix string, dst string) error {
 				panic(err) // If Name has prefix, this is impossible, it is impossible
 			}
 
-			dstPath = filepath.Join(t.probDir, dst, dstPath)
+			dstPath = filepath.Join(t.ProbDir, dst, dstPath)
 			err = os.MkdirAll(filepath.Dir(dstPath), 0774)
 			if err != nil {
 				return err
@@ -157,7 +161,7 @@ func (t *ImportTask) moveFileName(srcPath string, dstDir string) error {
 }
 
 func (t *ImportTask) moveFile(srcPath string, dstDir string, name string) error {
-	dstDir = filepath.Join(t.probDir, dstDir)
+	dstDir = filepath.Join(t.ProbDir, dstDir)
 	err := os.MkdirAll(dstDir, 0774)
 	if err != nil {
 		return fmt.Errorf("can not create dir %s for file %s, error: %s", dstDir, srcPath, err.Error())
