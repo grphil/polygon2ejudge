@@ -106,7 +106,7 @@ func (t *ImportTask) ProcessHTMLStatementsFiles() error {
 				t.statement.Statement.InputFormat = t.processTex(f)
 			case "output.tex":
 				t.statement.Statement.OutputFormat = t.processTex(f)
-			case "console.tex":
+			case "interaction.tex":
 				t.statement.Statement.Interaction = t.processTex(f)
 			case "notes.tex":
 				t.statement.Statement.Notes = t.processTex(f)
