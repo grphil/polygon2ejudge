@@ -79,6 +79,7 @@ func (t *ImportTask) generateHTMLStatements() {
 	}
 
 	t.statement.Statement = &EjudgeStatement{}
+	t.statement.Statement.Language = s.Language
 	t.statementPath = filepath.Join(t.ProbDir, "statement-sections", s.Language)
 
 	err = t.ProcessHTMLStatementsFiles()
