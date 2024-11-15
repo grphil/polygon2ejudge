@@ -42,6 +42,7 @@ func (t *ImportTask) latex2HTML(f string) (string, error) {
 	}
 
 	content := t.fixLatex(string(contentB))
+	fmt.Println(content)
 
 	texPath := filepath.Join(tmpPath, "a.tex")
 	err = os.WriteFile(texPath, []byte(content), 0664)
@@ -72,9 +73,16 @@ func (t *ImportTask) fixLatex(content string) string {
 	content = strings.ReplaceAll(content, "\\t{", "\\texttt{")
 	content = strings.ReplaceAll(content, "<<", "«")
 	content = strings.ReplaceAll(content, ">>", "»")
+	content = strings.ReplaceAll(content, "\\centering", "")
 
 	// fuck latex tables
 	content = strings.ReplaceAll(content, "\\parbox", "")
+
+	r := regexp.MustCompile(`\[[0-9]+.?[0-9]*(cm|mm)\]`)
+	content = r.ReplaceAllString(content, "")
+	r = regexp.MustCompile(`\{[0-9]+.?[0-9]*(cm|mm)\}`)
+	content = r.ReplaceAllString(content, "")
+	content = strings.ReplaceAll(content, "[c]", "")
 
 	runes := []rune(content)
 	c := strings.Builder{}
@@ -87,6 +95,7 @@ func (t *ImportTask) fixLatex(content string) string {
 
 	inTable := false
 	balance := 0
+	inFormula := false
 	for i := 0; i < len(runes); i++ {
 		if !inTable {
 			c.WriteRune(runes[i])
@@ -96,6 +105,9 @@ func (t *ImportTask) fixLatex(content string) string {
 			}
 			continue
 		} else {
+			if cmp(i, "$") && !cmp(i, "\\$") {
+				inFormula = !inFormula
+			}
 			if cmp(i, "\\{") {
 				c.WriteString("\\{")
 				i++
@@ -111,7 +123,20 @@ func (t *ImportTask) fixLatex(content string) string {
 				i++
 				continue
 			}
-			c.WriteRune(runes[i])
+			writeRune := true
+			if cmp(i, "{{") {
+				if inTable && !inFormula {
+					writeRune = false
+				}
+			}
+			if cmp(i, "}}") {
+				if inTable && !inFormula {
+					writeRune = false
+				}
+			}
+			if writeRune {
+				c.WriteRune(runes[i])
+			}
 			if cmp(i, "\\end{tabular}") {
 				inTable = false
 			}
@@ -123,6 +148,7 @@ func (t *ImportTask) fixLatex(content string) string {
 			}
 		}
 	}
+	print(c.String())
 
 	return c.String()
 }
