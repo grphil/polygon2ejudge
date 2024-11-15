@@ -190,10 +190,19 @@ func (t *ImportTask) fixHTML(s string) (string, error) {
 			}
 			break
 		}
-		img.Pointer.Attr = append(img.Pointer.Attr, html2.Attribute{
-			Key: "style",
-			Val: kStyle,
-		})
+		foundStyle := false
+		for i := range img.Pointer.Attr {
+			if img.Pointer.Attr[i].Key == "style" {
+				img.Pointer.Attr[i].Val = kStyle
+				foundStyle = true
+			}
+		}
+		if !foundStyle {
+			img.Pointer.Attr = append(img.Pointer.Attr, html2.Attribute{
+				Key: "style",
+				Val: kStyle,
+			})
+		}
 	}
 
 	embeds := html.FindAll("embed")

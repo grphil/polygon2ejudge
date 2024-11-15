@@ -86,6 +86,10 @@ func (t *ImportTask) fillInConfig() error {
 		t.config.Set("enable_user_input", true)
 	}
 
+	if *t.MergeGroups {
+		t.config.Set("enable_group_merge", true)
+	}
+
 	t.setCustomOptions()
 
 	return nil

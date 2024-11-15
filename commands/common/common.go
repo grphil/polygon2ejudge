@@ -32,6 +32,7 @@ type TaskCommon struct {
 	FullReportSamplesAcm *bool
 
 	NoConvertDprToPas *bool
+	MergeGroups       *bool
 }
 
 func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, hasSubmit bool, hasStatement bool) {
@@ -75,7 +76,7 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, h
 			Help: "Do not generate any statements (pdf and html)",
 		})
 
-		t.NoCompileMainSolution = parser.Flag("m", "no-compile-main", &argparse.Option{
+		t.NoCompileMainSolution = parser.Flag("", "no-compile-main", &argparse.Option{
 			Help: "Do not compile main solution for the problem",
 		})
 		t.CompileAllSolutions = parser.Flag("", "compile-all", &argparse.Option{
@@ -101,6 +102,9 @@ func (t *TaskCommon) AddCommonOptions(parser *argparse.Parser, hasImport bool, h
 
 		t.NoConvertDprToPas = parser.Flag("", "no-dpr-to-pas", &argparse.Option{
 			Help: "Do not change extension of all .dpr files to .pas",
+		})
+		t.MergeGroups = parser.Flag("m", "merge-groups", &argparse.Option{
+			Help: "Merge groups in problem",
 		})
 	} else {
 		t.Abstract = new(string)
