@@ -42,7 +42,6 @@ func (t *ImportTask) latex2HTML(f string) (string, error) {
 	}
 
 	content := t.fixLatex(string(contentB))
-	fmt.Println(content)
 
 	texPath := filepath.Join(tmpPath, "a.tex")
 	err = os.WriteFile(texPath, []byte(content), 0664)
@@ -74,6 +73,8 @@ func (t *ImportTask) fixLatex(content string) string {
 	content = strings.ReplaceAll(content, "<<", "«")
 	content = strings.ReplaceAll(content, ">>", "»")
 	content = strings.ReplaceAll(content, "\\centering", "")
+	content = strings.ReplaceAll(content, "\\mathrm{&lt;}", "<")
+	content = strings.ReplaceAll(content, "\\mathrm{&gt;}", ">")
 
 	// fuck latex tables
 	content = strings.ReplaceAll(content, "\\parbox", "")
@@ -148,7 +149,6 @@ func (t *ImportTask) fixLatex(content string) string {
 			}
 		}
 	}
-	print(c.String())
 
 	return c.String()
 }
@@ -205,6 +205,7 @@ func (t *ImportTask) fixHTML(s string) (string, error) {
 				continue
 			}
 			imgName := img.Pointer.Attr[i].Val
+
 			err := copyFile(
 				filepath.Join(t.statementPath, imgName),
 				filepath.Join(t.ProbDir, "attachments", imgName),
