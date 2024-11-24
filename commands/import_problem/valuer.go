@@ -43,7 +43,7 @@ func (t *ImportTask) processGroups(
 	var testScoreList []string
 
 	valuerCFG := &bytes.Buffer{}
-	valuerCFG.WriteString("global {\n    stat_to_judges 1;\n    stat_to_users 0;\n}\n\n")
+	valuerCFG.WriteString("global {\n    stat_to_judges 1;\n    stat_to_users 1;\n}\n\n")
 
 	for _, g := range t.groups {
 		if len(g.tests) == 0 {
