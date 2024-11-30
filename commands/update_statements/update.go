@@ -16,7 +16,7 @@ func (t *UpdateTask) UpdateProblemStatements() {
 	importTask.StatementsOnly = true
 	importTask.ImportProblem()
 
-	err = os.MkdirAll(filepath.Join(importTask.ProbDir, "attachments"), 0774)
+	err = os.MkdirAll(filepath.Join(importTask.ProbDir, "attachments"), 0775)
 	if err != nil {
 		t.Transaction.SetError(fmt.Errorf("error creating attachments directory, error: %v", err))
 		return

@@ -28,7 +28,7 @@ func (t *ImportTask) extractProblemFiles() error {
 	})
 
 	t.ProbDir = filepath.Join(t.tmpDir, "problem")
-	err = os.MkdirAll(filepath.Dir(t.ProbDir), 0774)
+	err = os.MkdirAll(filepath.Dir(t.ProbDir), 0775)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (t *ImportTask) extractAllFiles(prefix string, dst string) error {
 			}
 
 			dstPath = filepath.Join(t.ProbDir, dst, dstPath)
-			err = os.MkdirAll(filepath.Dir(dstPath), 0774)
+			err = os.MkdirAll(filepath.Dir(dstPath), 0775)
 			if err != nil {
 				return err
 			}
@@ -162,7 +162,7 @@ func (t *ImportTask) moveFileName(srcPath string, dstDir string) error {
 
 func (t *ImportTask) moveFile(srcPath string, dstDir string, name string) error {
 	dstDir = filepath.Join(t.ProbDir, dstDir)
-	err := os.MkdirAll(dstDir, 0774)
+	err := os.MkdirAll(dstDir, 0775)
 	if err != nil {
 		return fmt.Errorf("can not create dir %s for file %s, error: %s", dstDir, srcPath, err.Error())
 	}

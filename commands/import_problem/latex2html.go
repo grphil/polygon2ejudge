@@ -30,7 +30,7 @@ func (t *ImportTask) processTex(f string) string {
 
 func (t *ImportTask) latex2HTML(f string) (string, error) {
 	tmpPath := filepath.Join(t.tmpDir, "converter")
-	err := os.MkdirAll(tmpPath, 0774)
+	err := os.MkdirAll(tmpPath, 0775)
 	if err != nil {
 		return "", err
 	}
@@ -262,7 +262,7 @@ func (t *ImportTask) fixHTML(s string) (string, error) {
 
 func (t *ImportTask) convertEps(name string) (string, error) {
 	tmpPath := filepath.Join(t.tmpDir, "converter")
-	err := os.MkdirAll(tmpPath, 0774)
+	err := os.MkdirAll(tmpPath, 0775)
 	if err != nil {
 		return "", err
 	}
@@ -301,7 +301,7 @@ func (t *ImportTask) convertEps(name string) (string, error) {
 }
 
 func copyFile(src string, dst string) error {
-	err := os.MkdirAll(filepath.Dir(dst), 0774)
+	err := os.MkdirAll(filepath.Dir(dst), 0775)
 	if err != nil {
 		return err
 	}

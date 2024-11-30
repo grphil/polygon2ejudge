@@ -10,7 +10,7 @@ import (
 
 func (t *ImportTask) importPackage() error {
 	t.packagePath = filepath.Join(t.tmpDir, "package", "package.zip")
-	err := os.MkdirAll(filepath.Dir(t.packagePath), 0774)
+	err := os.MkdirAll(filepath.Dir(t.packagePath), 0775)
 	if err != nil {
 		return err
 	}

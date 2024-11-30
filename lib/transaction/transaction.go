@@ -111,7 +111,7 @@ func (t *Transaction) MovePath(src string, dst string) error {
 		return t.err
 	}
 
-	err := os.MkdirAll(filepath.Dir(dst), 0774)
+	err := os.MkdirAll(filepath.Dir(dst), 0775)
 	if err != nil {
 		t.err = fmt.Errorf("can not move path %s to %s, error: %s", src, dst, err)
 		return t.err
@@ -230,7 +230,7 @@ func (t *Transaction) setupCurrent() error {
 			ServeCfg:    t.applied.ServeCfg.Clone(),
 			TmpPath:     filepath.Join(t.tmpPath, strconv.Itoa(len(t.commitMessages))),
 		}
-		t.err = os.MkdirAll(t.current.TmpPath, 0774)
+		t.err = os.MkdirAll(t.current.TmpPath, 0775)
 		return t.err
 	}
 	return nil
