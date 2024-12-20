@@ -113,7 +113,6 @@ func (t *ImportTask) setCustomOptions() {
 
 		first = strings.TrimSpace(txt[:idx])
 		txt = strings.TrimSpace(txt[idx:])
-		fmt.Println(first, txt)
 
 		idx = strings.Index(txt, " ")
 		if idx == -1 {
