@@ -63,6 +63,8 @@ func (t *ImportTask) ImportProblem() {
 		}
 	}
 
+	t.setCustomOptions()
+
 	if !t.StatementsOnly {
 		t.Transaction.MovePath(
 			t.ProbDir,

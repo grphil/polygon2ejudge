@@ -90,8 +90,6 @@ func (t *ImportTask) fillInConfig() error {
 		t.config.Set("enable_group_merge", true)
 	}
 
-	t.setCustomOptions()
-
 	return nil
 }
 
@@ -115,6 +113,7 @@ func (t *ImportTask) setCustomOptions() {
 
 		first = strings.TrimSpace(txt[:idx])
 		txt = strings.TrimSpace(txt[idx:])
+		fmt.Println(first, txt)
 
 		idx = strings.Index(txt, " ")
 		if idx == -1 {
@@ -124,18 +123,18 @@ func (t *ImportTask) setCustomOptions() {
 			third = strings.TrimSpace(txt[idx:])
 		}
 
-		if first == "ejudge_config" {
+		if first == "ejudge_config:" {
 			if len(third) == 0 {
 				t.config.Set(second, orderedmap.NoVal(true))
 			} else {
 				t.config.Set(second, orderedmap.UnquotedStr(third))
 			}
 		}
-		if first == "ejudge_remove_config" {
+		if first == "ejudge_remove_config:" {
 			t.config.Remove(second)
 			t.problemOnlyConfig.Remove(second)
 		}
-		if first == "group_points" {
+		if first == "group_points:" {
 			for _, g := range t.testset.Groups.Groups {
 				if g.Name == second {
 					g.PointsPolicy = third
