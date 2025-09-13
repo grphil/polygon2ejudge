@@ -33,7 +33,7 @@ func downloadPackage(probID string, packageID string, outPath string) error {
 	values := url.Values{}
 	values.Set("problemId", probID)
 	values.Set("packageId", packageID)
-	values.Set("type", "linux")
+	values.Set("type", "windows")
 	values = fixApiValues(PACKAGE_METHOD, values)
 
 	client := resty.New()
