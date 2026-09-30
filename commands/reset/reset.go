@@ -6,7 +6,11 @@ import (
 )
 
 func AddResetConfigCommand(parser *argparse.Parser) {
-	reset := parser.AddCommand("reset", "Reset all configuration files", nil)
+	reset := parser.AddCommand(
+		"reset",
+		"Reset all configuration files",
+		&argparse.ParserConfig{DisableDefaultShowHelp: true},
+	)
 	globalConfigs := reset.Flag("g", "global", &argparse.Option{
 		Help: "Reset global options files",
 	})
